@@ -11,17 +11,15 @@ const path = require('path');
 const { CheckerPlugin } = require('awesome-typescript-loader');
 const { rulesCSS, rulesScss, rulesJS, rulesTsx, htmlWebpack, miniCssPlugin, happyPackMap } = require('./common');
 
-const devMode = process.env.NODE_ENV !== 'production'
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   devtool: 'inline-source-map',
   entry: [
-    './src/app.tsx',
-    'webpack-dev-server/client/index.js?http://localhost:8080/'
+    './src/app.tsx'
   ],
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, '../dist'),
     filename: '[name]_[hash:8].bundle.js'
   },
   module: {
