@@ -4,7 +4,9 @@ const webpackConfig = require('./webpack.config');
 
 const compiler = webpack(webpackConfig);
 const devServerOptions = Object.assign({}, webpackConfig.devServer, {
-  
+  hot: true,
+  compress: true,
+  color: true
 });
 
 const server = new webpackDevServer(compiler, devServerOptions);
