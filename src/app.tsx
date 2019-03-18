@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import Test from './components/test'
+import  './index.less';
 
-ReactDOM.render(<Test />, document.getElementById("#root"));
+ReactDOM.render(<div className="test">12312321</div>, document.getElementById("root") as Element);

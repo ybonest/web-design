@@ -1,13 +1,19 @@
 {
-  "compilerOptions": {
-      "outDir": "./dist/",
-      "sourceMap": true,
-      "noImplicitAny": true,
-      "module": "commonjs",
-      "target": "es5",
-      "jsx": "react"
-  },
-  "include": [
-      "./src/**/*"
-  ]
+    "compilerOptions": {
+        "outDir": "./dist/",
+        "sourceMap": true,
+        "noImplicitAny": true,
+        "module": "commonjs",
+        "target": "es5",
+        "removeComments": true,
+        "skipLibCheck": true, // 解決 TypeScript error: Duplicate identifier 'LibraryManagedAttributes'
+        "jsx": "react"
+    },
+    "include": [
+        "./src/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "**/*.spec.ts"
+    ]
 }
