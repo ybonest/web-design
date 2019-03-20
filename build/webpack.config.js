@@ -8,10 +8,21 @@
  */
 const webpack = require('webpack');
 const path = require('path');
-const AddHtmlWebpackPlugin = require('add-asset-html-webpack-plugin');
+const AddHtmlWebpackPlugin = require('add-asset-html-webpack-plugin'); // 将js插入html模板中
 
-const { CheckerPlugin } = require('awesome-typescript-loader');
-const { rulesCSS, rulesScss, rulesJS, rulesTsx, htmlWebpack, miniCssPlugin, happyPackMap } = require('./common');
+const {
+  CheckerPlugin
+} = require('awesome-typescript-loader');
+const {
+  rulesCSS,
+  rulesScss,
+  rulesLess,
+  rulesJS,
+  rulesTsx,
+  htmlWebpack,
+  miniCssPlugin,
+  happyPackMap
+} = require('./common');
 
 module.exports = {
   mode: 'development',
@@ -21,26 +32,27 @@ module.exports = {
     'webpack-dev-server/client/index.js?http://localhost:8080/'
   ],
   output: {
+    publicPath: '/',
     path: path.resolve(__dirname, '../dist'),
     filename: '[name]_[hash:8].bundle.js'
   },
   module: {
     rules: [
-      rulesCSS(), rulesScss(), rulesJS(), rulesTsx()
+      rulesCSS(), rulesScss(), rulesJS(), rulesTsx(), rulesLess()
     ]
   },
   resolve: {
-    extensions: [".js", ".ts", ".tsx", ".css", ".scss", ".json"]
+    extensions: [".js", ".ts", ".tsx", ".css", ".scss", ".less", ".json"]
   },
   plugins: [
     miniCssPlugin(),
     htmlWebpack(),
+    new AddHtmlWebpackPlugin({
+      filepath: path.resolve(__dirname, "../dll/*.dll.js")
+    }),
     new CheckerPlugin(),
     new webpack.DllReferencePlugin({
-      manifest: path.resolve(__dirname, "../dll/manifest.json")
-    }),
-    new AddHtmlWebpackPlugin({
-      filepath: require.resolve(__dirname, "../dll/manifest.json")
+      manifest: path.resolve(__dirname, "../dll/vendors.manifest.json")
     })
   ].concat(happyPackMap())
 }

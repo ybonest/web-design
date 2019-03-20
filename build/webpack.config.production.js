@@ -6,37 +6,91 @@
  * DeprecationWarning: Tapable.plugin is deprecated. Use new API on `.hooks` instead
  * 用mini-css-extract-plugin代替
  */
-const path = require("path");
 
-const { CheckerPlugin } = require("awesome-typescript-loader");
+ /**
+  * 抽离css
+  * mini-css-extract-plugin抽离css文件
+  */
+const path = require("path");
+const webpack = require('webpack');
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+// const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const {
+  CheckerPlugin
+} = require("awesome-typescript-loader");
+
 const {
   rulesCSS,
   rulesScss,
   rulesJS,
   rulesTsx,
   htmlWebpack,
-  miniCssPlugin,
+  rulesLess,
   happyPackMap
 } = require("./common");
 
 module.exports = {
-  mode: "production",
-  devtool: "inline-source-map",
-  entry: {
-    // vender: ["react", "react-dom"],
-    app: "./src/app.tsx"
-  },
+  mode: 'production',
+  devtool: 'nosources-source-map',
+  entry: [
+    './src/app.tsx'
+  ],
   output: {
     path: path.resolve(__dirname, "../dist"),
-    filename: "[name]_[hash:8].bundle.js"
+    chunkFilename: 'js/[name].bundle.js', // 此配置针对js中的import(/* webpackChunkName: "lodash" */ 'lodash')引入，返回Promise
+    filename: "js/[name]_[hash:8].bundle.js"
   },
   module: {
-    rules: [rulesCSS(), rulesScss(), rulesJS(), rulesTsx()]
+    rules: [rulesJS(), rulesTsx(), {
+      test: /\.less$/,
+      loaders: [MiniCssExtractPlugin.loader, rulesLess().use]
+    }, {
+      test: /\.scss$/,
+      loaders: [MiniCssExtractPlugin.loader, rulesScss().use]
+    }, {
+      test: /\.css$/,
+      loaders: [MiniCssExtractPlugin.loader, rulesCSS().use]
+    }]
   },
   resolve: {
-    extensions: [".js", ".ts", ".tsx", ".css", ".scss", ".json"]
+    extensions: [".js", ".ts", ".tsx", ".css", ".scss", ".less", ".json"]
   },
-  plugins: [miniCssPlugin(), htmlWebpack(), new CheckerPlugin()].concat(
+  optimization: {
+    minimizer: [
+      new UglifyJsPlugin({
+        cache: true,
+        parallel: true,
+        sourceMap: true // set to true if you want JS source maps
+      }),
+      // new OptimizeCSSAssetsPlugin({})
+    ],
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendor',
+          chunks: 'all',
+          minChunks: 2
+        },
+        styles: { // TODO 尚不知具体作用
+          name: 'styles',
+          test: /\.css$/,
+          minChunks: 1,
+          enforce: true
+        },
+      }
+    }
+  },
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: 'css/[name].[hash].css',
+      chunkFilename: 'css/[id].[hash].css',
+    }),
+    htmlWebpack(),
+    new CheckerPlugin(),
+    new webpack.HashedModuleIdsPlugin() // 通过optimization抽离出得第三方包每次编译都会重新生成hash名称，此插件可生成一致的hash名称
+  ].concat(
     happyPackMap()
   )
 };

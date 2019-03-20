@@ -21,6 +21,11 @@ exports.rulesScss = () => ({
   use: 'happypack/loader?id=scss'
 })
 
+exports.rulesLess = () =>({
+  test: /\.less$/,
+  use: 'happypack/loader?id=less'
+})
+
 exports.rulesJS = () => ({
   enforce: "pre",
   test: /\.js(x)$/,
@@ -36,8 +41,8 @@ exports.rulesTsx = () => ({
 // plugins
 exports.miniCssPlugin = () => (
   new MiniCssExtractPlugin({
-    filename: devMode ? '[name].css' : '[name].[hash].css',
-    chunkFilename: devMode ? '[id].css' : '[id].[hash].css',
+    filename: devMode ? 'css/[name].css' : 'css/[name].[hash].css',
+    chunkFilename: devMode ? 'css/[id].css' : 'css/[id].[hash].css',
   })
 )
 
@@ -47,6 +52,38 @@ exports.htmlWebpack = () => (
     template: './index.html'
   })
 )
+
+const less = {
+  id: 'less',
+  threadPool: happyThreadPool,
+  loaders: [{
+    loader: "css-loader" // 将 CSS 转化成 CommonJS 模块
+  }, {
+    loader: "less-loader" // 将 Sass 编译成 CSS
+  }]
+}
+
+const scss = {
+  id: 'scss',
+  threadPool: happyThreadPool,
+  loaders: [{
+    loader: "css-loader" // 将 CSS 转化成 CommonJS 模块
+  }, {
+    loader: "sass-loader" // 将 Sass 编译成 CSS
+  }]
+}
+
+const css = {
+  id: 'css',
+  threadPool: happyThreadPool,
+  loaders: ['css-loader']
+}
+
+if (devMode) {
+  scss.loaders.unshift({loader: "style-loader"});
+  css.loaders.unshift({loader: "style-loader"});
+  scss.loaders.unshift({loader: "style-loader"});
+}
 
 exports.happyPackMap = () => ([
   new HappyPack({
@@ -59,25 +96,7 @@ exports.happyPackMap = () => ([
       }
     }]
   }),
-  new HappyPack({
-    id: 'scss',
-    threadPool: happyThreadPool,
-    loaders: [{
-      loader: MiniCssExtractPlugin.loader,
-      options: {
-        publicPath: '../'
-      }
-    }, 'css-loader']
-  }),
-  new HappyPack({
-    id: 'css',
-    threadPool: happyThreadPool,
-    loaders: [{
-      loader: "style-loader" // 将 JS 字符串生成为 style 节点
-    }, {
-      loader: "css-loader" // 将 CSS 转化成 CommonJS 模块
-    }, {
-      loader: "sass-loader" // 将 Sass 编译成 CSS
-    }]
-  })
+  new HappyPack(scss),
+  new HappyPack(css),
+  new HappyPack(less)
 ])

@@ -1,0 +1,1 @@
+declare module '*.less'   // 当tsx引入less文件时，会提示无法找到less文件，添加此文件以及此语句处理引入问题

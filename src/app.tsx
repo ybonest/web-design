@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import Test from './components/test';
+import style from  './index.less';
 
-
-ReactDOM.render(<div>12312321</div>, document.getElementById("root"));
+ReactDOM.render(<div className={style.test}>12312321</div>, document.getElementById("root") as Element);
