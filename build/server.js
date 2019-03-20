@@ -7,11 +7,16 @@ const webpackConfig = require('./webpack.config');
  * 所以由此文件处理devServer配制
  */
 
-const compiler = webpack(webpackConfig);
-const devServerOptions = Object.assign({}, webpackConfig.devServer, {
+const options = {
+  contentBase: './dist',
   hot: true,
+  host: 'localhost',
   compress: true
-});
+};
+webpackDevServer.addDevServerEntrypoints(webpackConfig, options); // 热加载需使用此处
+
+const compiler = webpack(webpackConfig);
+const devServerOptions = Object.assign({}, webpackConfig.devServer, options);
 
 const server = new webpackDevServer(compiler, devServerOptions);
 
