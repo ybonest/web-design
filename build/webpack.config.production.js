@@ -7,10 +7,10 @@
  * 用mini-css-extract-plugin代替
  */
 
- /**
-  * 抽离css
-  * mini-css-extract-plugin抽离css文件
-  */
+/**
+ * 抽离css
+ * mini-css-extract-plugin抽离css文件
+ */
 const path = require("path");
 const webpack = require('webpack');
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
@@ -19,6 +19,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const {
   CheckerPlugin
 } = require("awesome-typescript-loader");
+const ServiceWorkerWebpackPlugin = require('serviceworker-webpack-plugin');
 
 const {
   rulesCSS,
@@ -27,7 +28,9 @@ const {
   rulesTsx,
   htmlWebpack,
   rulesLess,
-  happyPackMap
+  happyPackMap,
+  image,
+  font
 } = require("./common");
 
 module.exports = {
@@ -42,19 +45,25 @@ module.exports = {
     filename: "js/[name]_[hash:8].bundle.js"
   },
   module: {
-    rules: [rulesJS(), rulesTsx(), {
-      test: /\.less$/,
-      loaders: [MiniCssExtractPlugin.loader, rulesLess().use]
-    }, {
-      test: /\.scss$/,
-      loaders: [MiniCssExtractPlugin.loader, rulesScss().use]
-    }, {
-      test: /\.css$/,
-      loaders: [MiniCssExtractPlugin.loader, rulesCSS().use]
-    }]
+    rules: [
+      rulesJS(), 
+      // rulesTsx(), 
+      {
+        test: /\.less$/,
+        loaders: [MiniCssExtractPlugin.loader, rulesLess().use] // 使用mini-css-extract-plugin便不可以使用style-loader
+      }, {
+        test: /\.scss$/,
+        loaders: [MiniCssExtractPlugin.loader, rulesScss().use]
+      }, {
+        test: /\.css$/,
+        loaders: [MiniCssExtractPlugin.loader, rulesCSS().use]
+      }, 
+      image,
+      font
+    ]
   },
   resolve: {
-    extensions: [".js", ".ts", ".tsx", ".css", ".scss", ".less", ".json"]
+    extensions: [".js", ".ts", ".tsx", ".css", ".scss", ".less", ".json", ".jpg"]
   },
   optimization: {
     minimizer: [
@@ -88,7 +97,12 @@ module.exports = {
       chunkFilename: 'css/[id].[hash].css',
     }),
     htmlWebpack(),
-    new CheckerPlugin(),
+    new ServiceWorkerWebpackPlugin({
+      // 自定义的 sw.js 文件所在路径
+      // ServiceWorkerWebpackPlugin 会把文件列表注入到生成的 sw.js 中
+      entry: path.join(__dirname, '../sw.js'),
+    }),
+    // new CheckerPlugin(),
     new webpack.HashedModuleIdsPlugin() // 通过optimization抽离出得第三方包每次编译都会重新生成hash名称，此插件可生成一致的hash名称
   ].concat(
     happyPackMap()

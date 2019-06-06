@@ -5,14 +5,15 @@
  * webpack4中该插件不能使用，否则报错
  * DeprecationWarning: Tapable.plugin is deprecated. Use new API on `.hooks` instead
  * 用mini-css-extract-plugin代替
+ * 
+ * 开发生产环境配置（cross-env）
+ * window平台不识别NODE_ENV命令，cross-env能跨平台地设置及使用环境变量
  */
 const webpack = require('webpack');
 const path = require('path');
 const AddHtmlWebpackPlugin = require('add-asset-html-webpack-plugin'); // 将js插入html模板中
+const ServiceWorkerWebpackPlugin = require('serviceworker-webpack-plugin');
 
-const {
-  CheckerPlugin
-} = require('awesome-typescript-loader');
 const {
   rulesCSS,
   rulesScss,
@@ -21,7 +22,9 @@ const {
   rulesTsx,
   htmlWebpack,
   miniCssPlugin,
-  happyPackMap
+  happyPackMap,
+  image,
+  font
 } = require('./common');
 
 module.exports = {
@@ -38,21 +41,32 @@ module.exports = {
   },
   module: {
     rules: [
-      rulesCSS(), rulesScss(), rulesJS(), rulesTsx(), rulesLess()
+      rulesCSS(),
+      rulesScss(),
+      rulesLess(),
+      // rulesTsx(), 
+      rulesJS(),
+      image,
+      font
     ]
   },
   resolve: {
-    extensions: [".js", ".ts", ".tsx", ".css", ".scss", ".less", ".json"]
+    extensions: [".js", ".ts", ".tsx", ".css", ".scss", ".less", ".json", ".jpg"]
   },
   plugins: [
     miniCssPlugin(),
+    new webpack.HotModuleReplacementPlugin(),
     htmlWebpack(),
     new AddHtmlWebpackPlugin({
       filepath: path.resolve(__dirname, "../dll/*.dll.js")
     }),
-    new CheckerPlugin(),
     new webpack.DllReferencePlugin({
       manifest: path.resolve(__dirname, "../dll/vendors.manifest.json")
-    })
+    }),
+    new ServiceWorkerWebpackPlugin({
+      // 自定义的 sw.js 文件所在路径
+      // ServiceWorkerWebpackPlugin 会把文件列表注入到生成的 sw.js 中
+      entry: path.join(__dirname, '../sw.js'),
+    }),
   ].concat(happyPackMap())
 }

@@ -3,14 +3,20 @@
         "outDir": "./dist/",
         "sourceMap": true,
         "noImplicitAny": true,
+        // "module": "es2015", // "module": "ESNext", 时必须设置"moduleResolution": "node",
         "module": "commonjs",
-        "target": "es5",
+        // "moduleResolution": "node",
+        // "target": "es2015",
         "removeComments": true,
         "skipLibCheck": true, // 解決 TypeScript error: Duplicate identifier 'LibraryManagedAttributes'
-        "jsx": "react"
+        "jsx": "react",
+        "experimentalDecorators": true,
+        "esModuleInterop": true,
+        "typeRoots": ["./node_modules/@types/", "./typings/"]
     },
     "include": [
-        "./src/**/*"
+        "./src/**/*",
+        "./mock/**/*"
     ],
     "exclude": [
         "node_modules",
