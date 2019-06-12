@@ -51,7 +51,7 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: [".js", ".ts", ".tsx", ".css", ".scss", ".less", ".json", ".jpg"]
+    extensions: [".js", ".ts", ".tsx", ".jsx", ".css", ".scss", ".less", ".json", ".jpg"]
   },
   plugins: [
     miniCssPlugin(),
